@@ -32,7 +32,7 @@ require_once($CFG->dirroot.'/course/format/renderer.php');
  * @copyright 2012 Marina Glancy
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class format_flexsections_renderer extends plugin_renderer_base {
+class format_flexsections_renderer extends format_section_renderer_base {
     /** @var core_course_renderer Stores instances of core_course_renderer */
     protected $courserenderer = null;
 
@@ -45,6 +45,30 @@ class format_flexsections_renderer extends plugin_renderer_base {
     public function __construct(moodle_page $page, $target) {
         parent::__construct($page, $target);
         $this->courserenderer = $page->get_renderer('core', 'course');
+    }
+
+    /**
+     * Generate the starting container html for a list of sections
+     * @return string HTML to output.
+     */
+    protected function start_section_list() {
+        return html_writer::start_tag('ul', array('class' => 'flexsections'));
+    }
+
+    /**
+     * Generate the closing container html for a list of sections
+     * @return string HTML to output.
+     */
+    protected function end_section_list() {
+        return html_writer::end_tag('ul');
+    }
+
+    /**
+     * Generate the title for this section page
+     * @return string the page title
+     */
+    protected function page_title() {
+        return get_string('flexsections');
     }
 
     /**
@@ -94,7 +118,9 @@ class format_flexsections_renderer extends plugin_renderer_base {
         global $PAGE;
         $course = course_get_format($course)->get_course();
         $section = course_get_format($course)->get_section($section);
-        if (!$section->visible && !has_capability('moodle/course:viewhiddensections', context_course::instance($course->id))) {
+        $canviewhidden = has_capability('moodle/course:viewhiddensections', context_course::instance($course->id));
+
+        if (!$section->visible && !$canviewhidden || !$section->available && !$canviewhidden) {
             return '';
         }
         $sectionnum = $section->section;
@@ -145,6 +171,10 @@ class format_flexsections_renderer extends plugin_renderer_base {
             echo html_writer::tag('div', $summary, array('class' => 'summary'));
         } else {
             echo html_writer::tag('div', '', array('class' => 'summary nosummary'));
+        }
+        // display reason why section may be hidden
+        if (!$section->available && $canviewhidden) {
+            echo parent::section_availability_message($section, $canviewhidden);
         }
         // display section contents (activities and subsections)
         if ($section->collapsed == FORMAT_FLEXSECTIONS_EXPANDED || !$level) {
