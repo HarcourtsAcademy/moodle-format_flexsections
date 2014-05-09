@@ -372,6 +372,14 @@ class format_flexsections extends format_base {
                     )
                 ),
                 'default' => COURSE_DISPLAY_SINGLEPAGE,
+            ),
+            'customclass' => array(
+                'type' => PARAM_ALPHANUMEXT,
+                'label' => get_string('customclass', 'format_flexsections'),
+                'element_type' => 'text',
+                'element_attributes' => array(
+                    'size'=>'20'
+                )
             )
         );
     }

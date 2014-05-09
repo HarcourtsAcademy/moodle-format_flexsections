@@ -136,7 +136,7 @@ class format_flexsections_renderer extends format_section_renderer_base {
             }
         }
         echo html_writer::start_tag('li',
-                array('class' => "section main".
+                array('class' => "section main ".$section->customclass.
                     ($movingsection === $sectionnum ? ' ismoving' : '').
                     (course_get_format($course)->is_section_current($section) ? ' current' : '').
                     ($section->visible ? '' : ' hidden'),
