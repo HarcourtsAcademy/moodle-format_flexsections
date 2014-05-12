@@ -378,7 +378,7 @@ class format_flexsections extends format_base {
                 'label' => get_string('customclass', 'format_flexsections'),
                 'element_type' => 'text',
                 'element_attributes' => array(
-                    'size'=>'20'
+                    'size'=>'30'
                 )
             )
         );
