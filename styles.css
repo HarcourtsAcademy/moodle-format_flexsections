@@ -4,10 +4,20 @@
 /* END */
 .format-flexsections .course-content ul.flexsections li.section,
 .course-content ul.flexsections li.movehere {list-style: none; margin:3px 0 2px 0; padding:0;}
+.dir-rtl.format-flexsections .course-content ul.flexsections li.section,
+.dir-rtl.course-content ul.flexsections li.movehere {margin:3px 1em 2px 0;}
+.format-flexsections .course-content ul.flexsections-level-0 > li.section {margin-left: 0;}
+.format-flexsections .course-content ul.flexsections-level-0 > li.movehere {margin-left: 0;}
+.format-flexsections .course-content ul.flexsections li.section.main {border:none;}
+
 /* START Removed by Harcourts Academy
 .format-flexsections .course-content ul.flexsections-level-1 > li.section {border: #DDDDDD solid 1px;padding-left:5px;}
    END */
 .format-flexsections .course-content ul.flexsections li.section .controls img {padding-right: 4px;}
+
+/* Overwrite bootstrapbase styles */
+.format-flexsections .course-content ul.flexsections .controls a.hide,
+.format-flexsections .course-content ul.flexsections .controls a.show {display:inline;}
 
 /* hidden section */
 .format-flexsections .course-content li.section.hidden > .content > h3.sectionname,
@@ -17,8 +27,8 @@
 .format-flexsections .course-content li.section.hidden a.addsection {color:#AAAAAA;}
 
 /* add extra borders in editing mode */
-body.format-flexsections.editing .course-content ul.flexsections li.section {border: #DDDDDD solid 1px;padding:0 5px;}
-body.format-flexsections.editing .course-content ul.flexsections li.section#section-0 {border: none;padding-left:0;}
+.format-flexsections.editing .course-content ul.flexsections li.section.main {border: #DDDDDD solid 1px;padding-left:5px;padding-right:5px;}
+.format-flexsections.editing .course-content ul.flexsections li.section.main#section-0 {border: none;padding-left:0;padding-right:0;}
 
 /* moving section */
 .format-flexsections .course-content ul.flexsections li.section.ismoving {background:#EEEEEE;}
