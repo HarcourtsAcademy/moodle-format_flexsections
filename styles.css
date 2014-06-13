@@ -3,7 +3,7 @@
 .format-flexsections .course-content > ul.flexsections > li.section.main {border:0;}
 /* END */
 .format-flexsections .course-content ul.flexsections li.section,
-.course-content ul.flexsections li.movehere {list-style: none; margin:3px 0 2px 0; padding:0;}
+.course-content ul.flexsections li.movehere {list-style: none; margin: 0 0 5px 0; padding:0;}
 .dir-rtl.format-flexsections .course-content ul.flexsections li.section,
 .dir-rtl.course-content ul.flexsections li.movehere {margin:3px 1em 2px 0;}
 .format-flexsections .course-content ul.flexsections-level-0 > li.section {margin-left: 0;}
