@@ -159,7 +159,7 @@ class format_flexsections_renderer extends format_section_renderer_base {
         }
 
         // display section content
-        $supresslink = ($level == 0 || !$section->available) && !$canviewhidden;
+        $supresslink = $level == 0 || (!$section->available && !$canviewhidden);
         echo html_writer::start_tag('div', array('class' => 'content'));
         // display section name and expanded/collapsed control
         $title = $this->section_title($sectionnum, $course, $supresslink);
