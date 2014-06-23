@@ -120,7 +120,7 @@ class format_flexsections_renderer extends format_section_renderer_base {
         $section = course_get_format($course)->get_section($section);
         $canviewhidden = has_capability('moodle/course:viewhiddensections', context_course::instance($course->id));
 
-        if (!$section->visible && !$canviewhidden || !$section->available && !$canviewhidden) {
+        if (!$section->uservisible && $section->showavailability == 0) {
             return '';
         }
         $sectionnum = $section->section;
@@ -139,7 +139,8 @@ class format_flexsections_renderer extends format_section_renderer_base {
                 array('class' => "section main ".format_string($section->customclass).
                     ($movingsection === $sectionnum ? ' ismoving' : '').
                     (course_get_format($course)->is_section_current($section) ? ' current' : '').
-                    ($section->visible ? '' : ' hidden'),
+                    ($section->visible ? '' : ' hidden').
+                    ($section->available ? '' : ' hidden'),
                     'id' => 'section-'.$sectionnum));
 
         // display controls except for expanded/collapsed
@@ -158,9 +159,12 @@ class format_flexsections_renderer extends format_section_renderer_base {
         }
 
         // display section content
+        $supresslink = ($level == 0 || !$section->available) && !$canviewhidden;
         echo html_writer::start_tag('div', array('class' => 'content'));
         // display section name and expanded/collapsed control
-        if ($sectionnum && ($title = $this->section_title($sectionnum, $course, $level == 0))) {
+        $title = $this->section_title($sectionnum, $course, $supresslink);
+
+        if ($sectionnum && $title) {
             if ($collapsedcontrol) {
                 $title = $this->render($collapsedcontrol). $title;
             }
