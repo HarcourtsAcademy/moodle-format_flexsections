@@ -25,8 +25,8 @@
 
 $string['addsection'] = 'Add section';
 $string['addsubsection'] = 'Add subsection';
-$string['backtocourse'] = '{$a}';
-$string['backtosection'] = '{$a}';
+$string['backtocourse'] = 'Back to {$a}';
+$string['backtosection'] = 'Back to {$a}';
 $string['cancelmoving'] = 'Cancel moving \'{$a}\'';
 $string['currentsection'] = 'This section';
 $string['displaycontent'] = 'Display content';
