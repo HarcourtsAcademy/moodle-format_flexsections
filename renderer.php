@@ -135,6 +135,35 @@ class format_flexsections_renderer extends format_section_renderer_base {
                 $this->display_insert_section_here($course, $section->parent, $section->section);
             }
         }
+
+        // display section content
+        $supresslink = $level == 0 || (!$section->available && !$canviewhidden);
+
+        // determine whether the iStart24 student can access the week
+        if (!$canviewhidden && $section->istartweek > 0) {
+            $usersgroup = groups_get_user_groups($course->id);
+
+            // $usersgroup[groupingid][groupid] includes grouping id 0 which means all groups
+            if (isset($usersgroup[0][0])) {
+                $group = groups_get_group($usersgroup[0][0], 'idnumber');
+
+                $secondsinweek = 7 * 24 * 60 * 60; // 7 days, 24 hours, 60 mins, 60 secs
+
+                // Enter the group's week 1 start date as the "Group ID number" E.g. 1 August 2014
+                $weekstarttime = strtotime($group->idnumber)
+                        + (($section->istartweek - 1) * $secondsinweek);
+                
+                // If the week hasn't started yet, displayed it as unavailable
+                if ($weekstarttime > time()) {
+                    $supresslink = true;
+                    $section->available = false;
+                }
+            } else {
+                global $USER;
+                error_log("iStart24 Online student $USER->username is not in a group.");
+            }
+        }
+
         echo html_writer::start_tag('li',
                 array('class' => "section main ".format_string($section->customclass).
                     ($movingsection === $sectionnum ? ' ismoving' : '').
@@ -158,8 +187,6 @@ class format_flexsections_renderer extends format_section_renderer_base {
             echo html_writer::tag('div', $controlsstr, array('class' => 'controls'));
         }
 
-        // display section content
-        $supresslink = $level == 0 || (!$section->available && !$canviewhidden);
         echo html_writer::start_tag('div', array('class' => 'content'));
         // display section name and expanded/collapsed control
         $title = $this->section_title($sectionnum, $course, $supresslink);
