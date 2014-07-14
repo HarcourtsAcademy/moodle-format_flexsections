@@ -350,6 +350,8 @@ class format_flexsections extends format_base {
      * @return array
      */
     public function section_format_options($foreditform = false) {
+        $istartweeks = range(0,24);
+
         return array(
             'parent' => array(
                 'type' => PARAM_INT,
@@ -386,6 +388,12 @@ class format_flexsections extends format_base {
                 'element_attributes' => array(
                     'size'=>'30'
                 )
+            ),
+            'istartweek' => array(
+                'type' => PARAM_INT,
+                'label' => get_string('weeknumber', 'format_flexsections'),
+                'element_type' => 'select',
+                'element_attributes' => array($istartweeks),
             )
         );
     }
