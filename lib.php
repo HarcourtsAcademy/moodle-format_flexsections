@@ -76,11 +76,6 @@ class format_flexsections extends format_base {
         $url = new moodle_url('/course/view.php', array('id' => $this->courseid));
 
         $sectionno = $this->get_section_number($section);
-        $section = $this->get_section($sectionno);
-        if ($sectionno && (!$section->uservisible || !$this->is_section_real_available($section))) {
-            return empty($options['navigation']) ? $url : null;
-        }
-
         if (array_key_exists('sr', $options)) {
             // return to the page for section with number $sr
             $url->param('section', $options['sr']);
@@ -90,6 +85,7 @@ class format_flexsections extends format_base {
         } else if (!empty($options['navigation'])) {
             // this is called from navigation, create link only if this
             // section has separate page
+            $section = $this->get_section($sectionno);
             if ($section->collapsed == FORMAT_FLEXSECTIONS_COLLAPSED) {
                 $url->param('sectionid', $section->id);
             } else {
@@ -97,6 +93,7 @@ class format_flexsections extends format_base {
             }
         } else if ($sectionno) {
             // check if this section has separate page
+            $section = $this->get_section($sectionno);
             if ($section->collapsed == FORMAT_FLEXSECTIONS_COLLAPSED) {
                 $url->param('sectionid', $section->id);
                 return $url;
@@ -353,6 +350,8 @@ class format_flexsections extends format_base {
      * @return array
      */
     public function section_format_options($foreditform = false) {
+        $istartweeks = range(0,24);
+
         return array(
             'parent' => array(
                 'type' => PARAM_INT,
@@ -381,6 +380,20 @@ class format_flexsections extends format_base {
                     )
                 ),
                 'default' => COURSE_DISPLAY_SINGLEPAGE,
+            ),
+            'customclass' => array(
+                'type' => PARAM_TEXT,
+                'label' => get_string('customclass', 'format_flexsections'),
+                'element_type' => 'text',
+                'element_attributes' => array(
+                    'size'=>'30'
+            )
+            ),
+            'istartweek' => array(
+                'type' => PARAM_INT,
+                'label' => get_string('weeknumber', 'format_flexsections'),
+                'element_type' => 'select',
+                'element_attributes' => array($istartweeks),
             )
         );
     }
@@ -1091,6 +1104,44 @@ class format_flexsections extends format_base {
         }
 
         return parent::course_content_header();
+    }
+
+    /**
+     * Course-specific information to be output immediately below content on any course page
+     *
+     * See {@link format_base::course_footer()} for usage
+     *
+     * @return null|renderable null for no output or object with data for plugin renderer
+     */
+    public function course_content_footer() {
+        global $PAGE;
+
+        // if we are on course view page for particular section, return 'back to parent' control
+        if ($this->get_viewed_section()) {
+            $section = $this->get_section($this->get_viewed_section());
+            if ($section->parent) {
+                $sr = $this->find_collapsed_parent($section->parent);
+                $text = new lang_string('backtosection', 'format_flexsections', $this->get_section_name($section->parent));
+            } else {
+                $sr = 0;
+                $text = new lang_string('backtocourse', 'format_flexsections', $this->get_course()->fullname);
+            }
+            $url = $this->get_view_url($section->section, array('sr' => $sr));
+            return new format_flexsections_edit_control('backto', $url, strip_tags($text));
+        }
+
+        // if we are on module view page, return 'back to section' control
+        if ($PAGE->context && $PAGE->context->contextlevel == CONTEXT_MODULE && $PAGE->cm) {
+            $sectionnum = $PAGE->cm->sectionnum;
+            if ($sectionnum) {
+                $text = new lang_string('backtosection', 'format_flexsections', $this->get_section_name($sectionnum));
+            } else {
+                $text = new lang_string('backtocourse', 'format_flexsections', $this->get_course()->fullname);
+            }
+            return new format_flexsections_edit_control('backto', $this->get_view_url($sectionnum), strip_tags($text));
+        }
+
+        return parent::course_content_footer();
     }
 
     /**
