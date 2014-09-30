@@ -25,11 +25,13 @@
 
 $string['addsection'] = 'Add section';
 $string['addsubsection'] = 'Add subsection';
-$string['backtocourse'] = 'Back to course \'{$a}\'';
-$string['backtosection'] = 'Back to \'{$a}\'';
+$string['backtocourse'] = 'Back to {$a}';
+$string['backtosection'] = 'Back to {$a}';
 $string['cancelmoving'] = 'Cancel moving \'{$a}\'';
 $string['currentsection'] = 'This section';
 $string['displaycontent'] = 'Display content';
+$string['customclass'] = 'Custom class';
+$string['weeknumber'] = 'iStart24 Week number';
 $string['hidefromothers'] = 'Hide topic';
 $string['mergeup'] = 'Merge with parent';
 $string['page-course-view-flexsections'] = 'Any course main page in flexsections format';
