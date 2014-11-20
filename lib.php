@@ -387,13 +387,18 @@ class format_flexsections extends format_base {
                 'element_type' => 'text',
                 'element_attributes' => array(
                     'size'=>'30'
-            )
+                )
             ),
             'istartweek' => array(
                 'type' => PARAM_INT,
                 'label' => get_string('weeknumber', 'format_flexsections'),
                 'element_type' => 'select',
                 'element_attributes' => array($istartweeks),
+            ),
+            'reportcompletions' => array(
+                'type' => PARAM_BOOL,
+                'label' => get_string('reportcompletions', 'format_flexsections'),
+                'element_type' => 'selectyesno'
             )
         );
     }
