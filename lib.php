@@ -259,17 +259,11 @@ class format_flexsections extends format_base {
      * @return null|navigation_node
      */
     protected function navigation_add_activity(navigation_node $node, $cm) {
-        global $CFG;
-        if (!$this->is_cm_real_uservisible($cm) || $cm->modname === 'label') {
+        if (!$cm->uservisible || !$cm->has_view()) {
             return null;
         }
-        $activityname = format_string($cm->name, true, array('context' => context_module::instance($cm->id)));
-        if ($CFG->version >= 2013111800) {
-            // Moodle 2.6 and above.
-            $action = $cm->url;
-        } else {
-            $action = $cm->get_url();
-        }
+        $activityname = $cm->get_formatted_name();
+        $action = $cm->url;
         if ($cm->icon) {
             $icon = new pix_icon($cm->icon, $cm->modfullname, $cm->iconcomponent);
         } else {
@@ -473,7 +467,7 @@ class format_flexsections extends format_base {
      *
      * @param section_info $section
      */
-    protected function delete_section($section) {
+    protected function delete_section_int($section) {
         global $DB;
         if (!$section->section) {
             // section 0 does not have parent
@@ -585,7 +579,7 @@ class format_flexsections extends format_base {
                     && optional_param('confirm', 0, PARAM_INT) == 1) {
                 $section = $this->get_section($deletesection, MUST_EXIST);
                 $parent = $section->parent;
-                $this->delete_section($section);
+                $this->delete_section_int($section);
                 $url = course_get_url($this->courseid, $parent);
                 redirect($url);
             }
@@ -654,19 +648,6 @@ class format_flexsections extends format_base {
                 $this->set_section_visible($show, 1);
                 redirect($url);
             }
-        }
-    }
-
-    /**
-     * Allows course format to execute code on moodle_page::set_cm()
-     *
-     * Current module can be accessed as $page->cm (returns instance of cm_info)
-     *
-     * @param moodle_page $page instance of page calling set_cm
-     */
-    public function page_set_cm(moodle_page $page) {
-        if (!$this->is_cm_real_uservisible($page->cm)) {
-            throw new moodle_exception('nopermissiontoviewpage');
         }
     }
 
@@ -1223,10 +1204,7 @@ class format_flexsections extends format_base {
     /**
      * Checks if section is really available for the current user (analyses parent section available)
      *
-     * This function always return true for teacher who is able to see hidden sections.
-     * section_info::$available would return false but section_info::$uservisible would return true.
-     *
-     * @param int|section_info|section_info $section
+     * @param int|section_info $section
      * @return bool
      */
     public function is_section_real_available($section) {
@@ -1244,13 +1222,32 @@ class format_flexsections extends format_base {
     }
 
     /**
-     * Checks if course module is really visible for the current user (analyses correct section visibility)
+     * Checks if all section's parents are available
      *
-     * @param cm_info $cm
+     * @param int|section_info $section
      * @return bool
      */
-    public function is_cm_real_uservisible(cm_info $cm) {
-        return $cm->uservisible && $this->is_section_real_available($cm->sectionnum);
+    public function is_section_parent_available($section) {
+        if (($this->get_section_number($section) == 0)) {
+            // Section 0 is always available.
+            return true;
+        }
+        $section = $this->get_section($section, MUST_EXIST);
+        $parent = $this->get_section($section->parent, MUST_EXIST);
+        return $parent->available && $this->is_section_parent_available($parent);
+    }
+
+    /**
+     * Allows to specify for modinfo that section is not available even when it is visible and conditionally available.
+     *
+     * @param section_info $section
+     * @param bool $available
+     * @param string $availableinfo
+     */
+    public function section_get_available_hook(section_info $section, &$available, &$availableinfo) {
+        if ($available && !$this->is_section_parent_available($section)) {
+            $available = false;
+        }
     }
 }
 
