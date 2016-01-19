@@ -95,6 +95,11 @@ class format_flexsections extends format_base {
         $url = new moodle_url('/course/view.php', array('id' => $this->courseid));
 
         $sectionno = $this->get_section_number($section);
+        $section = $this->get_section($sectionno);
+        if ($sectionno && (!$section->uservisible || !$this->is_section_real_available($section))) {
+            return empty($options['navigation']) ? $url : null;
+        }
+
         if (array_key_exists('sr', $options)) {
             // return to the page for section with number $sr
             $url->param('section', $options['sr']);
@@ -104,7 +109,6 @@ class format_flexsections extends format_base {
         } else if (!empty($options['navigation'])) {
             // this is called from navigation, create link only if this
             // section has separate page
-            $section = $this->get_section($sectionno);
             if ($section->collapsed == FORMAT_FLEXSECTIONS_COLLAPSED) {
                 $url->param('sectionid', $section->id);
             } else {
@@ -112,7 +116,6 @@ class format_flexsections extends format_base {
             }
         } else if ($sectionno) {
             // check if this section has separate page
-            $section = $this->get_section($sectionno);
             if ($section->collapsed == FORMAT_FLEXSECTIONS_COLLAPSED) {
                 $url->param('sectionid', $section->id);
                 return $url;

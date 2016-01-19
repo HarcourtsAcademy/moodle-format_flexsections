@@ -27,12 +27,6 @@ Version 2.7.1
 - Trick to inherit availability for the children sections
 - Conditional availability updated for new Moodle 2.7 API
 
-Version 2.7.1
--------------
-
-- Trick to inherit availability for the children sections
-- Conditional availability updated for new Moodle 2.7 API
-
 Version 2.5.2
 -------------
 

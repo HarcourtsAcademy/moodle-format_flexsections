@@ -122,8 +122,13 @@ class format_flexsections_renderer extends format_section_renderer_base {
         $contentvisible = true;
         $canviewhidden = has_capability('moodle/course:viewhiddensections', context_course::instance($course->id));
 
-        if (!$section->uservisible && $section->showavailability == 0) {
-            return '';
+        if (!$section->uservisible || !course_get_format($course)->is_section_real_available($section)) {
+            if ($section->visible && !$section->available && $section->availableinfo) {
+                // Still display section but without content.
+                $contentvisible = false;
+            } else {
+                return '';
+            }
         }
         $sectionnum = $section->section;
         $movingsection = course_get_format($course)->is_moving_section();
@@ -170,8 +175,7 @@ class format_flexsections_renderer extends format_section_renderer_base {
                 array('class' => "section main ".format_string($section->customclass).
                     ($movingsection === $sectionnum ? ' ismoving' : '').
                     (course_get_format($course)->is_section_current($section) ? ' current' : '').
-                    ($section->visible ? '' : ' hidden').
-                    ($section->available ? '' : ' hidden'),
+                    (($section->visible && $contentvisible) ? '' : ' hidden'),
                     'id' => 'section-'.$sectionnum));
 
         // display controls except for expanded/collapsed
@@ -192,9 +196,7 @@ class format_flexsections_renderer extends format_section_renderer_base {
         // display section content
         echo html_writer::start_tag('div', array('class' => 'content'));
         // display section name and expanded/collapsed control
-        $title = $this->section_title($sectionnum, $course, $supresslink);
-
-        if ($sectionnum && $title) {
+        if ($sectionnum && ($title = $this->section_title($sectionnum, $course, ($level == 0) || !$contentvisible))) {
             if ($collapsedcontrol) {
                 $title = $this->render($collapsedcontrol). $title;
             }
