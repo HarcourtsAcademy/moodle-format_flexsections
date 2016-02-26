@@ -283,11 +283,13 @@ class format_flexsections_renderer extends format_section_renderer_base {
             $text = $this->render($icon). html_writer::tag('span', $control->text, array('class' => $control->class.'-text'));
             $action = new action_link($control->url, $text, null, array('class' => $control->class));
             return html_writer::tag('div', $this->render($action), array('class' => 'mdl-right'));
-        } else if ($control->class === 'backto') {
+/* START Academy Patch M#043 Course Flexsection ‘back to’ buttons use bootstrap button styling. */
+            } else if ($control->class === 'backto') {
             $icon = new pix_icon('t/left', '', 'moodle');
             $text = $this->render($icon). html_writer::tag('span', $control->text, array('class' => $control->class.'-text'));
-            return html_writer::tag('div', html_writer::link($control->url, $text),
-                    array('class' => 'header '.$control->class));
+            return html_writer::link($control->url, $text,
+                    array('class' => 'header btn '.$control->class));
+/* END Academy Patch */
         } else if ($control->class === 'settings' || $control->class === 'marker' || $control->class === 'marked') {
             $icon = new pix_icon('i/'. $control->class, $control->text, 'moodle', array('class' => 'iconsmall', 'title' => $control->text));
         } else if ($control->class === 'move' || $control->class === 'expanded' || $control->class === 'collapsed' ||
