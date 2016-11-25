@@ -286,7 +286,7 @@ class format_flexsections_renderer extends format_section_renderer_base {
 /* START Academy Patch M#043 Course Flexsection ‘back to’ buttons use bootstrap button styling. */
             } else if ($control->class === 'backto') {
             $icon = new pix_icon('t/left', '', 'moodle');
-            $text = $this->render($icon). html_writer::tag('span', $control->text, array('class' => $control->class.'-text'));
+            $text = $this->render($icon). html_writer::tag('span', format_string($control->text), array('class' => $control->class.'-text'));
             return html_writer::link($control->url, $text,
                     array('class' => 'header btn '.$control->class));
 /* END Academy Patch */
