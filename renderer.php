@@ -32,7 +32,7 @@ require_once($CFG->dirroot.'/course/format/renderer.php');
  * @copyright 2012 Marina Glancy
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class format_flexsections_renderer extends format_section_renderer_base {
+class format_flexsections_renderer extends plugin_renderer_base {
     /** @var core_course_renderer Stores instances of core_course_renderer */
     protected $courserenderer = null;
 
@@ -45,30 +45,6 @@ class format_flexsections_renderer extends format_section_renderer_base {
     public function __construct(moodle_page $page, $target) {
         parent::__construct($page, $target);
         $this->courserenderer = $page->get_renderer('core', 'course');
-    }
-
-    /**
-     * Generate the starting container html for a list of sections
-     * @return string HTML to output.
-     */
-    protected function start_section_list() {
-        return html_writer::start_tag('ul', array('class' => 'flexsections'));
-    }
-
-    /**
-     * Generate the closing container html for a list of sections
-     * @return string HTML to output.
-     */
-    protected function end_section_list() {
-        return html_writer::end_tag('ul');
-    }
-
-    /**
-     * Generate the title for this section page
-     * @return string the page title
-     */
-    protected function page_title() {
-        return get_string('flexsections');
     }
 
     /**
@@ -126,8 +102,6 @@ class format_flexsections_renderer extends format_section_renderer_base {
         $section = course_get_format($course)->get_section($section);
         $context = context_course::instance($course->id);
         $contentvisible = true;
-        $canviewhidden = has_capability('moodle/course:viewhiddensections', context_course::instance($course->id));
-
         if (!$section->uservisible || !course_get_format($course)->is_section_real_available($section)) {
             if ($section->visible && !$section->available && $section->availableinfo) {
                 // Still display section but without content.
@@ -148,37 +122,8 @@ class format_flexsections_renderer extends format_section_renderer_base {
                 $this->display_insert_section_here($course, $section->parent, $section->section, $sr);
             }
         }
-
-        // display section content
-        $supresslink = $level == 0 || (!$section->available && !$canviewhidden);
-
-        // determine whether the iStart24 student can access the week
-        if (!$canviewhidden && $section->istartweek > 0) {
-            $usersgroup = groups_get_user_groups($course->id);
-
-            // $usersgroup[groupingid][groupid] includes grouping id 0 which means all groups
-            if (isset($usersgroup[0][0])) {
-                $group = groups_get_group($usersgroup[0][0], 'idnumber');
-
-                $secondsinweek = 7 * 24 * 60 * 60; // 7 days, 24 hours, 60 mins, 60 secs
-
-                // Enter the group's week 1 start date as the "Group ID number" E.g. 1 August 2014
-                $weekstarttime = strtotime($group->idnumber)
-                        + (($section->istartweek - 1) * $secondsinweek);
-
-                // If the week hasn't started yet, displayed it as unavailable
-                if ($weekstarttime > time()) {
-                    $supresslink = true;
-                    $section->available = false;
-                }
-            } else {
-                global $USER;
-                error_log("iStart24 Online student $USER->username is not in a group.");
-            }
-        }
-
         echo html_writer::start_tag('li',
-                array('class' => "section main ".format_string($section->customclass).
+                array('class' => "section main".
                     ($movingsection === $sectionnum ? ' ismoving' : '').
                     (course_get_format($course)->is_section_current($section) ? ' current' : '').
                     (($section->visible && $contentvisible) ? '' : ' hidden'),

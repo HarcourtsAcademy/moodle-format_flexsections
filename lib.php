@@ -369,8 +369,6 @@ class format_flexsections extends format_base {
      * @return array
      */
     public function section_format_options($foreditform = false) {
-        $istartweeks = range(0,24);
-
         return array(
             'parent' => array(
                 'type' => PARAM_INT,
@@ -399,26 +397,7 @@ class format_flexsections extends format_base {
                     )
                 ),
                 'default' => COURSE_DISPLAY_SINGLEPAGE,
-            ),
-            'customclass' => array(
-                'type' => PARAM_TEXT,
-                'label' => get_string('customclass', 'format_flexsections'),
-                'element_type' => 'text',
-                'element_attributes' => array(
-                    'size'=>'30'
                 )
-            ),
-            'istartweek' => array(
-                'type' => PARAM_INT,
-                'label' => get_string('weeknumber', 'format_flexsections'),
-                'element_type' => 'select',
-                'element_attributes' => array($istartweeks),
-            ),
-            'reportcompletions' => array(
-                'type' => PARAM_BOOL,
-                'label' => get_string('reportcompletions', 'format_flexsections'),
-                'element_type' => 'selectyesno'
-            )
         );
     }
 
