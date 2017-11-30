@@ -1,6 +1,17 @@
 moodle-format_flexsections
 ==========================
 
+Version 3.2.0
+-------------
+
+- Release for Moodle 3.2 with passing behat tests and CSS adjustments for Boost theme
+
+Version 2.8.4
+-------------
+
+- Compatibility with section name editing in Moodle 3.1 (still works on previous
+  versions)
+
 Version 2.8.3
 -------------
 
