@@ -106,14 +106,6 @@ class format_flexsections extends format_base {
             if ($sectionno) {
                 $url->set_anchor('section-'.$sectionno);
             }
-        } else if (!empty($options['navigation'])) {
-            // this is called from navigation, create link only if this
-            // section has separate page
-            if ($section->collapsed == FORMAT_FLEXSECTIONS_COLLAPSED) {
-                $url->param('sectionid', $section->id);
-            } else {
-                return null;
-            }
         } else if ($sectionno) {
             // check if this section has separate page
             if ($section->collapsed == FORMAT_FLEXSECTIONS_COLLAPSED) {
@@ -296,6 +288,9 @@ class format_flexsections extends format_base {
             $activitynode->nodetype = navigation_node::NODETYPE_BRANCH;
         } else {
             $activitynode->nodetype = navigation_node::NODETYPE_LEAF;
+        }
+        if (method_exists($cm, 'is_visible_on_course_page')) {
+            $activitynode->display = $cm->is_visible_on_course_page();
         }
         return $activitynode;
     }
@@ -656,6 +651,28 @@ class format_flexsections extends format_base {
                 redirect($url);
             }
         }
+    }
+
+    /**
+     * Adds format options elements to the course/section edit form
+     *
+     * This function is called from {@link course_edit_form::definition_after_data()}
+     *
+     * @param MoodleQuickForm $mform form the elements are added to
+     * @param bool $forsection 'true' if this is a section edit form, 'false' if this is course edit form
+     * @return array array of references to the added form elements
+     */
+    public function create_edit_form_elements(&$mform, $forsection = false) {
+        $elements = parent::create_edit_form_elements($mform, $forsection);
+        if ($forsection && ($section0 = $this->get_section(0))) {
+            // Disable/hide "collapsed" control for general section. Hiding is availabe in Moodle 3.4 and above.
+            if (method_exists($mform, 'hideIf')) {
+                $mform->hideIf('collapsed', 'id', 'eq', $section0->id);
+            } else {
+                $mform->disabledIf('collapsed', 'id', 'eq', $section0->id);
+            }
+        }
+        return $elements;
     }
 
     /**
@@ -1278,6 +1295,19 @@ class format_flexsections extends format_base {
         }
         return parent::inplace_editable_render_section_name($section, $linkifneeded, $editable, $edithint, $editlabel);
     }
+
+    /**
+     * Returns whether this course format allows the activity to
+     * have "triple visibility state" - visible always, hidden on course page but available, hidden.
+     *
+     * @param stdClass|cm_info $cm course module (may be null if we are displaying a form for adding a module)
+     * @param stdClass|section_info $section section where this module is located or will be added to
+     * @return bool
+     */
+    public function allow_stealth_module_visibility($cm, $section) {
+        // Allow the third visibility state inside visible sections or in section 0.
+        return !$section->section || $section->visible;
+    }
 }
 
 /**
@@ -1315,4 +1345,13 @@ function format_flexsections_inplace_editable($itemtype, $itemid, $newvalue) {
             array($itemid, 'flexsections'), MUST_EXIST);
         return course_get_format($section->course)->inplace_editable_update_section_name($section, $itemtype, $newvalue);
     }
+}
+
+/**
+ * Get icon mapping for font-awesome.
+ */
+function format_flexsections_get_fontawesome_icon_map() {
+    return [
+        'format_flexsections:mergeup' => 'fa-level-up',
+    ];
 }

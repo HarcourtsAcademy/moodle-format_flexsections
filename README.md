@@ -1,6 +1,17 @@
 moodle-format_flexsections
 ==========================
 
+Version 3.2.2
+-------------
+
+- Release for Moodle 3.4, 3.3 and 3.2
+- Improved whitespaces
+
+Version 3.2.1
+-------------
+
+- Release for Moodle 3.3 and 3.2
+
 Version 3.2.0
 -------------
 
